@@ -126,12 +126,23 @@ class YOLOv8Live:
         with sr.AudioFile("messageOfUser.wav") as source:
             audio = r.record(source)
 
-        if "left" in r.recognize_google(audio) and "right" not in r.recognize_google(audio):
-            self._speak(f'There is a: {", ".join(self.left_detections())}')
-        elif "right" in r.recognize_google(audio) and "left" not in r.recognize_google(audio):
-            self._speak(f'There is a: {", ".join(self.right_detections())}')
+        recognized_text = r.recognize_google(audio) if audio else ""
+
+        if "left" in recognized_text and "right" not in recognized_text:
+            left_detections = self.left_detections()
+            if left_detections:
+                self._speak(f'There is a: {", ".join(left_detections)}')
+            else:
+                self._speak("No objects detected on the left.")
+        elif "right" in recognized_text and "left" not in recognized_text:
+            right_detections = self.right_detections()
+            if right_detections:
+                self._speak(f'There is a: {", ".join(right_detections)}')
+            else:
+                self._speak("No objects detected on the right.")
         else:
             self._speak("Invalid comment, either the word left or the word right must be mentioned in the voice recording.")
+
 
     def _speak(self, text):
         language = 'en'
