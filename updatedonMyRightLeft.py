@@ -53,6 +53,7 @@ class VoiceRecorder:
     def on_button_click(self):
         self.record_voice()
         self.yolo_instance.detection()
+       
 
     def run(self):
         self.create_button()

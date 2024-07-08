@@ -83,7 +83,7 @@ class YOLOv8Live:
 
     def left_detections(self):
         left_detections = []
-        result_list = []
+        left_result_list = []
         
         if self.detections is not None:
             for xyxy, mask, conf, class_id, tracker_id, data in self.detections:
@@ -97,19 +97,19 @@ class YOLOv8Live:
         unique_classes = list(set(left_detections))
         for cls in unique_classes:
             count = left_detections.count(cls)
-            result_list.append(f"{count} {cls}")
+            left_result_list.append(f"{count} {cls}")
         
-        return result_list
+        return left_result_list
 
     def right_detections(self):
         right_detections = []
-        result_list = []
+        right_result_list = []
         
         if self.detections is not None:
             for xyxy, mask, conf, class_id, tracker_id, data in self.detections:
                 x1, y1, x2, y2 = xyxy
-                tlx, tly = self.zone_polygon_left[0]
-                brx, bry = self.zone_polygon_left[2]
+                tlx, tly = self.zone_polygon_right[0]
+                brx, bry = self.zone_polygon_right[2]
                 
                 if x1 >= tlx and y1 >= tly and x2 <= brx and y2 <= bry:
                     right_detections.append(self.model.names[class_id])
@@ -117,11 +117,19 @@ class YOLOv8Live:
         unique_classes = list(set(right_detections))
         for cls in unique_classes:
             count = right_detections.count(cls)
-            result_list.append(f"{count} {cls}")
+            right_result_list.append(f"{count} {cls}")
         
-        return result_list
+        return right_result_list
     
     def detection(self):
+        left_result = [item.split(' ', 1)[1] for item in self.left_detections()] 
+        right_result = [item.split(' ', 1)[1] for item in self.right_detections()] 
+        names = list(self.model.names.values())
+
+        print(f'LEFT DETECTIONS ARE= {left_result}')
+        print(f'RIGHT DETECTIONS ARE= {right_result}')
+        print(f'model = {names}, {type(names)}')
+
         r = sr.Recognizer()
         with sr.AudioFile("messageOfUser.wav") as source:
             audio = r.record(source)
@@ -141,7 +149,28 @@ class YOLOv8Live:
             else:
                 self._speak("No objects detected on the right.")
         else:
-            self._speak("Invalid comment, either the word left or the word right must be mentioned in the voice recording.")
+            for x in names:
+                if "where" in recognized_text and x in recognized_text:
+                    if x in left_result and x not in right_result:
+                        self._speak(f'The {x} is in left')
+                    elif x in right_result and x not in left_result:
+                        self._speak(f'The {x} is in right')
+                    elif x in right_result and x in left_result:
+                        self._speak(f'Two {x} are detected both in left and right')
+                    else:
+                        self._speak(f'No {x} is detected')
+
+
+        
+
+
+
+
+        
+
+
+
+
 
 
     def _speak(self, text):
