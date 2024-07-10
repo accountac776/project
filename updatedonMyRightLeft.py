@@ -8,6 +8,7 @@ from main import YOLOv8Live
 
 class VoiceRecorder:
     def __init__(self, yolo_instance):
+        print("Initializing VoiceRecorder")
         self.yolo_instance = yolo_instance
         self.FRAMES_PER_BUFFER = 3200
         self.FORMAT = pyaudio.paInt16
@@ -15,6 +16,7 @@ class VoiceRecorder:
         self.RATE = 16000
 
     def record_voice(self):
+        print("Starting voice recording...")
         seconds = 5
         p = pyaudio.PyAudio()
         stream = p.open(
@@ -40,6 +42,7 @@ class VoiceRecorder:
         obj.setframerate(self.RATE)
         obj.writeframes(b"".join(frames))
         obj.close()
+        print("Voice recording saved to messageOfUser.wav")
 
     def create_button(self):
         window = tk.Tk()
@@ -54,6 +57,5 @@ class VoiceRecorder:
         self.record_voice()
         self.yolo_instance.detection()
        
-
     def run(self):
         self.create_button()

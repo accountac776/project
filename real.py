@@ -10,9 +10,11 @@ def run_audio_module(yolo_live):
     recorder.run()
 
 if __name__ == "__main__":
+    print("Parsing arguments...")
     args = YOLOv8Live.parse_arguments()
-    yolo_live = YOLOv8Live(webcam_resolution=args.webcam_resolution)
+    yolo_live = YOLOv8Live(front_resolution=args.front_resolution, back_resolution=args.back_resolution)
 
+    print("Starting camera and audio threads...")
     camera_thread = threading.Thread(target=run_camera_module, args=(yolo_live,))
     audio_thread = threading.Thread(target=run_audio_module, args=(yolo_live,))
 
